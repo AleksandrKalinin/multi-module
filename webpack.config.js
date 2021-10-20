@@ -8,11 +8,16 @@ module.exports = {
         test: /\.(js)$/,
         exclude: /node_modules/,
         use: ['babel-loader']
+      },
+      {
+        test: /\.(css)$/,
+        use: ['style-loader', 'css-loader']        
       }
+
     ]
   },
   resolve: {
-    extensions: ['*', '.js']
+    extensions: ['*', '.js', '.css']
   },
   output: {
     path: path.resolve(__dirname, './dist'),

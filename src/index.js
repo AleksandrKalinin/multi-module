@@ -1,51 +1,34 @@
-//const regeneratorRuntime = require("regenerator-runtime");
+  import './style.css';
 
   const URL = 'https://api.publicapis.org/entries';
 
-  window.onload = function() {
-    getItems()
-      .then(items => console.log("Items fetched"))
-      .catch(err => console.log(err));
+  window.onload = function() {    
+    getItems();
   }
-  
-  let data;
 
-  async function getItems() {
-    try {
-      let res = await fetch(URL);
-      if (!res.ok) {
-        throw new Error(res.statusText);
-      }
-      data = await res.json();
-      renderData(data.entries);
-      getCategories(data.entries)
-    } catch ({ error }) {
-      throw new Error(error);
+let data;
+
+async function getItems() {
+  try {
+    let res = await fetch(URL);
+    if (!res.ok) {
+      throw new Error(res.statusText);
     }
+    data = await res.json();
+    import('./renderData.js').then((module) => { 
+      module.renderData(data.entries);
+      getCategories(data.entries);
+    });
+  } catch ({ error }) {
+    throw new Error(error);
   }
-
-async function renderData(data) {
-  let root = document.getElementById('root');
-  root.innerHTML = '';
-  for (var i = 0; i < data.length; i++) {
-    let row = document.createElement('tr');
-    let id = document.createElement('td');
-    id.innerText = i;
-    let title = document.createElement('td');
-    title.innerText = data[i].API;
-    let category = document.createElement('td');
-    category.innerText = data[i].Category;
-    row.setAttribute('dataId', i);
-    row.appendChild(id);
-    row.appendChild(title);
-    row.appendChild(category);
-    root.appendChild(row);
-  } 
-}
-
+}  
+  
 async function getCategories(data) {
   let select = document.createElement('select');
+  select.setAttribute('name', 'Category');
   let select2 = document.createElement('select');
+  select2.setAttribute('name', 'API');
   let head = document.getElementById('head');
   const uniqueItems = [...new Set(data.map(item => item.Category))];
   for (var i = 0; i < uniqueItems.length; i++) {
@@ -62,16 +45,18 @@ async function getCategories(data) {
     select2.appendChild(option);
   }
 
-  select.addEventListener('change', function(e) {
-    let newData = data.filter(item => item.Category === e.target.value);
-    renderData(newData);
-  })
+  select.addEventListener('change', filterData);
 
-  select2.addEventListener('change', function(e) {
-    let newData = data.filter(item => item.API === e.target.value);
-    renderData(newData);
-  })    
+  select2.addEventListener('change', filterData); 
 
   head.appendChild(select);
   head.appendChild(select2);
+}
+
+function filterData(e) {
+  let name = e.target.name;
+  let newData = data.entries.filter(item => item[name] === e.target.value);
+    import('./renderData.js').then((module) => { 
+      module.renderData(newData);
+    }); 
 }
